@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="30 seconds" debug="true">
+    <contextName>win999</contextName>
+
+    <logger name="org.asynchttpclient" level="WARN" additivity="false"/>
+    <logger name="io.netty" level="WARN" additivity="false"/>
+
+    <root level="DEBUG">
+        <appender class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <Pattern>%d{ISO8601} [%t] %-5p %c{0} - %m%n</Pattern>
+            </encoder>
+        </appender>
+    </root>
+
+</configuration>
