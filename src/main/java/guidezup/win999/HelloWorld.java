@@ -14,7 +14,7 @@ public class HelloWorld {
 
         ApiClient a = new ApiClient();
         a.setBasePath("https://api-sandbox.dwolla.com");
-//        a.setAccessToken("CFQhG5iIiQCObuSXAtqkr3oC5jmcurd7WoRNK4i3KCEGMmeRBo");
+        a.setAccessToken("CFQhG5iIiQCObuSXAtqkr3oC5jmcurd7WoRNK4i3KCEGMmeRBo__");
         a.getAuthentications();
         CustomersApi c = new CustomersApi(a);
         CreateCustomer myNewCust = new CreateCustomer();
@@ -22,9 +22,11 @@ public class HelloWorld {
         myNewCust.setFirstName("First");
         myNewCust.setLastName("Last");
 
+
         Unit$ r = null;
         try {
             r = c.create(myNewCust);
+//            c.updateCustomer()
         } catch (ApiException e) {
             e.printStackTrace();
         }

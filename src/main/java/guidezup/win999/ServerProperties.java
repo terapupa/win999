@@ -12,6 +12,7 @@ import static guidezup.win999.Utils.UNKNOWN;
 
 public class ServerProperties {
     private static final Logger log = LoggerFactory.getLogger(ServerProperties.class);
+    private static final String authUrl = "authUrl";
     private static final String baseUrl = "baseUrl";
     private static final String param1 = "param1";
     private static final String param2 = "param2";
@@ -68,10 +69,18 @@ public class ServerProperties {
         return getParam(param2);
     }
 
+    public String getAuthUrl() {
+        return getStringProp(authUrl);
+    }
+
     public String getBaseUrl() {
-        String prop = properties.getProperty(baseUrl, UNKNOWN);
+        return getStringProp(baseUrl);
+    }
+
+    private String getStringProp(String propName) {
+        String prop = properties.getProperty(propName, UNKNOWN);
         if (UNKNOWN.equals(prop)) {
-            log.error("Property {} not found!!!", baseUrl);
+            log.error("Property {} not found!!!", propName);
         }
         return prop;
     }

@@ -1,4 +1,4 @@
-package guidezup.win999.sys;
+package guidezup.win999.sys.DAO.dwolla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import guidezup.win999.Utils;
@@ -22,7 +22,7 @@ public class TokenRetrieve {
 
     private static final String key = Utils.getParam1();
     private static final String sec = Utils.getParam2();
-    private static final String url = Utils.getBaseUrl();
+    private static final String url = Utils.getAuthUrl();
 
 //    private static final String key = "XH1Oe09DVokB1PUxYHcllCGsuD4eNpopeLrPNc36wc45HFWv1Z";
 //    private static final String sec = "RxbLCs0bnE9RGxYUsn5FFBb1N9dTxxFSykfDBjNtx43pg37iGU";
@@ -98,8 +98,8 @@ public class TokenRetrieve {
         }
     }
 
-    public static void main(String[] arg) {
-        log.info("token={}", TokenRetrieve.getInstance().getToken());
-    }
+//    public static void main(String[] arg) {
+//        log.info("token={}", TokenRetrieve.getInstance().getToken());
+//    }
 
 }

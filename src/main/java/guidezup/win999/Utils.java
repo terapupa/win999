@@ -19,19 +19,21 @@ public class Utils {
         return mapper;
     }
 
-    public static String getParam1()
-    {
+    public static String getParam1() {
         return ServerProperties.getInstance().getParam1();
     }
 
-    public static String getParam2()
-    {
+    public static String getParam2() {
         return ServerProperties.getInstance().getParam2();
     }
 
-    public static String getBaseUrl()
-    {
+    public static String getAuthUrl() {
+        return ServerProperties.getInstance().getAuthUrl();
+    }
+
+    public static String getBaseUrl() {
         return ServerProperties.getInstance().getBaseUrl();
     }
+
 
 }
