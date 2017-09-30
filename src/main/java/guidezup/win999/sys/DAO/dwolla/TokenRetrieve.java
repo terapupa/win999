@@ -46,7 +46,7 @@ public class TokenRetrieve {
     public String getToken() {
         while (UNKNOWN.equals(token.get())) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
             }
         }

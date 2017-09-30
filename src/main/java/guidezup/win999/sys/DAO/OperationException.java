@@ -1,6 +1,8 @@
 package guidezup.win999.sys.DAO;
 
 public class OperationException extends Exception {
+    public static final int SOME_PROBLEM_CODE = 1000;
+
     private int code = 0;
     private String message = null;
 

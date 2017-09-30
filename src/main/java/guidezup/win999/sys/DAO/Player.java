@@ -5,13 +5,20 @@ public class Player {
     private String firstName;
     private String lastName;
     private String email;
+    private String status = "unverified";
 
-    public Player(String id, String firstName, String lastName, String email) {
+    public Player(String id, String firstName, String lastName, String email, String status) {
+        this(id, firstName, lastName, email);
+        this.status = status;
+    }
+
+    public Player(String id, String firstName, String lastName, String emails) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
     }
+
 
     public void setId(String id) {
         this.id = id;
@@ -43,5 +50,13 @@ public class Player {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
