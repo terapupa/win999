@@ -9,4 +9,6 @@ public interface PlayerDao {
     public Player retrievePlayer(String id) throws OperationException;
 
     public Player deactivatePlayer(String id) throws OperationException;
+
+    public Player createMoneySource(String id, MoneySource ms) throws OperationException;
 }

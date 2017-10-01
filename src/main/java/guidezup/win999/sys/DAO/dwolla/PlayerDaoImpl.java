@@ -1,14 +1,18 @@
 package guidezup.win999.sys.DAO.dwolla;
 
 import guidezup.win999.Utils;
+import guidezup.win999.sys.DAO.MoneySource;
 import guidezup.win999.sys.DAO.OperationException;
 import guidezup.win999.sys.DAO.Player;
 import guidezup.win999.sys.DAO.PlayerDao;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.CustomersApi;
+import io.swagger.client.api.FundingsourcesApi;
 import io.swagger.client.model.CreateCustomer;
+import io.swagger.client.model.CreateFundingSourceRequest;
 import io.swagger.client.model.Customer;
+import io.swagger.client.model.FundingSource;
 import io.swagger.client.model.Unit$;
 import io.swagger.client.model.UpdateCustomer;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +32,7 @@ public class PlayerDaoImpl implements PlayerDao {
         createCustomer.setLastName(lastName);
         try {
             Unit$ response = customersApi.create(createCustomer);
-            player = retrievePlayer(response.getLocationHeader());
+            player = new Player(Utils.getIdFromUrlString(response.getLocationHeader()), firstName, lastName, email);
         } catch (ApiException e) {
             log.error("errorCode={}, message={}", e.getCode(), e.getMessage());
             throw new OperationException(e.getCode(), e.getMessage());
@@ -105,6 +109,28 @@ public class PlayerDaoImpl implements PlayerDao {
         return player;
     }
 
+    public Player createMoneySource(String id, MoneySource ms) throws OperationException {
+        Player player = retrievePlayer(id);
+        FundingsourcesApi fsApi = new FundingsourcesApi(createApiClient());
+        try {
+            CreateFundingSourceRequest request = new CreateFundingSourceRequest();
+            request.setRoutingNumber(ms.getRoutingNumber());
+            request.setAccountNumber(ms.getAccountNumber());
+            request.setType(ms.getType().name());
+            request.setName(ms.getName());
+            FundingSource fs = fsApi.createCustomerFundingSource(request, id);
+            ms.setId(Utils.getIdFromUrlString(fs.getLocationHeader()));
+            player.getMoneySources().add(ms);
+        } catch (ApiException e) {
+            log.error("errorCode={}, message={}", e.getCode(), e.getMessage());
+            throw new OperationException(e.getCode(), e.getMessage());
+        } catch (Exception e) {
+            log.error("errorCode={}, message={}", OperationException.SOME_PROBLEM_CODE, e.getMessage());
+            throw new OperationException(OperationException.SOME_PROBLEM_CODE, e.getMessage());
+        }
+        return player;
+    }
+
     private ApiClient createApiClient() {
         ApiClient apiClient = new ApiClient();
         apiClient.setBasePath(Utils.getBaseUrl());
@@ -119,9 +145,13 @@ public class PlayerDaoImpl implements PlayerDao {
     public static void main(String[] arg) {
         PlayerDaoImpl pdi = new PlayerDaoImpl();
         try {
-            Player p = pdi.createPlayer("John", "Smith", "JS-2@gmail.com");
-            p = pdi.retrievePlayer(p.getId());
-            p = pdi.deactivatePlayer(p.getId());
+//            Player p = pdi.createPlayer("John", "Smith", "JS-6@gmail.com");
+            MoneySource ms = new MoneySource();
+            ms.setAccountNumber("222222227");
+            ms.setRoutingNumber("222222226");
+            ms.setName("test1");
+
+            Player p = pdi.createMoneySource("2b03a9d0-199c-4a16-934d-7207aab9eca4", ms);
 
             log.info("done");
         } catch (OperationException e) {
