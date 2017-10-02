@@ -1,16 +1,15 @@
 package guidezup.win999.sys.DAO;
 
-import static guidezup.win999.sys.DAO.MoneySource.AccountType.checking;
-
 public class MoneySource {
 
     private String id;
-    private String routingNumber;
-    private String accountNumber;
-    private AccountType type = checking;
+    private SourceType type = SourceType.bank;
     private String name;
+    private String status;
 
     public enum AccountType {checking, savings};
+
+    public enum SourceType {bank, balance};
 
     public String getId() {
         return id;
@@ -20,28 +19,11 @@ public class MoneySource {
         this.id = id;
     }
 
-
-    public String getRoutingNumber() {
-        return routingNumber;
-    }
-
-    public void setRoutingNumber(String routingNumber) {
-        this.routingNumber = routingNumber;
-    }
-
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
-
-    public AccountType getType() {
+    public SourceType getType() {
         return type;
     }
 
-    public void setType(AccountType type) {
+    public void setType(SourceType type) {
         this.type = type;
     }
 
@@ -51,6 +33,14 @@ public class MoneySource {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
 }

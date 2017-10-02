@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static guidezup.win999.Utils.createApiClient;
+
 public class PlayerDaoImpl implements PlayerDao {
     private static final Logger log = LoggerFactory.getLogger(PlayerDaoImpl.class);
 
@@ -109,54 +111,51 @@ public class PlayerDaoImpl implements PlayerDao {
         return player;
     }
 
-    public Player createMoneySource(String id, MoneySource ms) throws OperationException {
-        Player player = retrievePlayer(id);
-        FundingsourcesApi fsApi = new FundingsourcesApi(createApiClient());
-        try {
-            CreateFundingSourceRequest request = new CreateFundingSourceRequest();
-            request.setRoutingNumber(ms.getRoutingNumber());
-            request.setAccountNumber(ms.getAccountNumber());
-            request.setType(ms.getType().name());
-            request.setName(ms.getName());
-            FundingSource fs = fsApi.createCustomerFundingSource(request, id);
-            ms.setId(Utils.getIdFromUrlString(fs.getLocationHeader()));
-            player.getMoneySources().add(ms);
-        } catch (ApiException e) {
-            log.error("errorCode={}, message={}", e.getCode(), e.getMessage());
-            throw new OperationException(e.getCode(), e.getMessage());
-        } catch (Exception e) {
-            log.error("errorCode={}, message={}", OperationException.SOME_PROBLEM_CODE, e.getMessage());
-            throw new OperationException(OperationException.SOME_PROBLEM_CODE, e.getMessage());
-        }
-        return player;
-    }
-
-    private ApiClient createApiClient() {
-        ApiClient apiClient = new ApiClient();
-        apiClient.setBasePath(Utils.getBaseUrl());
-        apiClient.setAccessToken(TokenRetrieve.getInstance().getToken());
-        return apiClient;
-    }
+//    public Player createMoneySource(String id, MoneySource ms) throws OperationException {
+//        Player player = retrievePlayer(id);
+//        FundingsourcesApi fsApi = new FundingsourcesApi(createApiClient());
+//        try {
+//            CreateFundingSourceRequest request = new CreateFundingSourceRequest();
+//            request.setRoutingNumber(ms.getRoutingNumber());
+//            request.setAccountNumber(ms.getAccountNumber());
+//            request.setType(ms.getType().name());
+//            request.setName(ms.getName());
+//            FundingSource fs = fsApi.createCustomerFundingSource(request, id);
+//            ms.setId(Utils.getIdFromUrlString(fs.getLocationHeader()));
+//            player.getMoneySources().add(ms);
+//        } catch (ApiException e) {
+//            log.error("errorCode={}, message={}", e.getCode(), e.getMessage());
+//            throw new OperationException(e.getCode(), e.getMessage());
+//        } catch (Exception e) {
+//            log.error("errorCode={}, message={}", OperationException.SOME_PROBLEM_CODE, e.getMessage());
+//            throw new OperationException(OperationException.SOME_PROBLEM_CODE, e.getMessage());
+//        }
+//        return player;
+//    }
+//
+//    public Player retrieveMoneySources(String id, boolean activeOnly) throws OperationException {
+//        return null;
+//    }
 
     private CustomersApi getCustomerApi() {
         return new CustomersApi(createApiClient());
     }
 
-    public static void main(String[] arg) {
-        PlayerDaoImpl pdi = new PlayerDaoImpl();
-        try {
-//            Player p = pdi.createPlayer("John", "Smith", "JS-6@gmail.com");
-            MoneySource ms = new MoneySource();
-            ms.setAccountNumber("222222227");
-            ms.setRoutingNumber("222222226");
-            ms.setName("test1");
-
-            Player p = pdi.createMoneySource("2b03a9d0-199c-4a16-934d-7207aab9eca4", ms);
-
-            log.info("done");
-        } catch (OperationException e) {
-            log.error(e.getMessage());
-        }
-    }
+//    public static void main(String[] arg) {
+//        PlayerDaoImpl pdi = new PlayerDaoImpl();
+//        try {
+////            Player p = pdi.createPlayer("John", "Smith", "JS-6@gmail.com");
+//            MoneySource ms = new MoneySource();
+//            ms.setAccountNumber("222222227");
+//            ms.setRoutingNumber("222222226");
+//            ms.setName("test1");
+//
+//            Player p = pdi.createMoneySource("2b03a9d0-199c-4a16-934d-7207aab9eca4", ms);
+//
+//            log.info("done");
+//        } catch (OperationException e) {
+//            log.error(e.getMessage());
+//        }
+//    }
 
 }
