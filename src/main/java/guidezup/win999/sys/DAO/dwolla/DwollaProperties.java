@@ -83,8 +83,6 @@ public class DwollaProperties {
         return getStringProp(microDepositeUrl);
     }
 
-
-
     private String getStringProp(String propName) {
         String prop = properties.getProperty(propName, UNKNOWN);
         if (UNKNOWN.equals(prop)) {
@@ -92,6 +90,5 @@ public class DwollaProperties {
         }
         return prop;
     }
-
 
 }

@@ -13,8 +13,8 @@ class DwollaUtils {
 
     static OperationException exceptionTreatment(Logger log, Exception e) {
         if (e instanceof ApiException) {
-            log.error("errorCode={}, message={}", ((ApiException)e).getCode(), e.getMessage());
-            return new OperationException(((ApiException)e).getCode(), e.getMessage());
+            log.error("errorCode={}, message={}", ((ApiException) e).getCode(), e.getMessage());
+            return new OperationException(((ApiException) e).getCode(), e.getMessage());
         } else {
             log.error("errorCode={}, message={}", OperationException.SOME_PROBLEM_CODE, e.getMessage());
             return new OperationException(OperationException.SOME_PROBLEM_CODE, e.getMessage());
@@ -47,12 +47,14 @@ class DwollaUtils {
     public static String getMicroDepositeUrl(String moneySourceId) {
         String url = DwollaProperties.getInstance().getMicroDepositeUrl();
         if (!UNKNOWN.equals(url)) {
-            url = MessageFormat.format(url, moneySourceId);
+            url = getMicroDepositeUrlFormat(url, moneySourceId);
         }
         return url;
     }
 
-
+    private static synchronized String getMicroDepositeUrlFormat(String url, String moneySourceId) {
+        return MessageFormat.format(url, moneySourceId);
+    }
 
 
 }
