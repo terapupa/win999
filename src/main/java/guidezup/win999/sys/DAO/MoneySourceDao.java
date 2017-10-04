@@ -12,6 +12,6 @@ public interface MoneySourceDao {
 
     public MoneySource removeMoneySource(String id) throws OperationException;
 
-    public MoneySource initMicroDeposite(String id) throws OperationException;
+    public boolean initMicroDeposite(String id) throws OperationException;
 
     }

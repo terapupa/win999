@@ -9,9 +9,14 @@ import io.swagger.client.model.CreateFundingSourceRequest;
 import io.swagger.client.model.FundingSource;
 import io.swagger.client.model.FundingSourceListResponse;
 import io.swagger.client.model.RemoveBankRequest;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.BoundRequestBuilder;
+import org.asynchttpclient.DefaultAsyncHttpClient;
+import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +46,7 @@ public class MoneySourceDaoImpl implements MoneySourceDao {
         try {
             FundingSourceListResponse fslr = getFundingsourcesApi().getCustomerFundingSources(playerId, !activeOnly);
             List<Map<String, String>> list = (List<Map<String, String>>) ((Map) fslr.getEmbedded()).get("funding-sources");
-            List<MoneySource> result = new ArrayList<MoneySource>();
+            List<MoneySource> result = new ArrayList<>();
             for (Map<String, String> m : list) {
                 MoneySource ms = new MoneySource();
                 ms.setId(m.get("id"));
@@ -88,9 +93,37 @@ public class MoneySourceDaoImpl implements MoneySourceDao {
     }
 
     @Override
-    public MoneySource initMicroDeposite(String id) throws OperationException {
+    public boolean initMicroDeposite(String id) throws OperationException {
         String url = DwollaUtils.getMicroDepositeUrl(id);
-        return null;
+        AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
+        try {
+            final BoundRequestBuilder builder = asyncHttpClient.
+                    preparePost(url).
+                    addHeader("Authorization", "Bearer " + TokenRetrieve.getInstance().getToken()).
+                    addHeader("Content-Type", "application/vnd.dwolla.v1.hal+json").
+                    addHeader("Accept", "application/vnd.dwolla.v1.hal+json");
+            Response response = builder.execute().get();
+            if (response != null) {
+                if (response.getStatusCode() == 201) {
+                    return true;
+                } else {
+                    log.error("errorCode={}, message={}", response.getStatusCode(), response.getResponseBody());
+                    throw new OperationException(response.getStatusCode(), response.getResponseBody());
+                }
+            } else {
+                log.error("errorCode={}, message={}", OperationException.SOME_PROBLEM_CODE, "response=null");
+                throw new OperationException(OperationException.SOME_PROBLEM_CODE, "response=null");
+            }
+        } catch (Exception e) {
+            log.error("errorCode={}, message={}", OperationException.SOME_PROBLEM_CODE, e.getMessage());
+            throw new OperationException(OperationException.SOME_PROBLEM_CODE, e.getMessage());
+        } finally {
+            try {
+                asyncHttpClient.close();
+            } catch (IOException e1) {
+                log.warn(e1.getMessage(), e1);
+            }
+        }
     }
 
     private static FundingsourcesApi getFundingsourcesApi() {
@@ -101,7 +134,7 @@ public class MoneySourceDaoImpl implements MoneySourceDao {
         MoneySourceDaoImpl pdi = new MoneySourceDaoImpl();
         try {
 
-            pdi.initMicroDeposite("104dbd31-3328-4f90-9227-43d9ca6e3be9");
+            pdi.initMicroDeposite("459ed320-7c2b-4d4f-940a-cb86ab706d43");
 
 //            MoneySource l = pdi.createMoneySource("2b03a9d0-199c-4a16-934d-7207aab9eca4", "222222226",
 //                    "007776662", "mayBank", MoneySource.AccountType.checking);
@@ -119,7 +152,6 @@ public class MoneySourceDaoImpl implements MoneySourceDao {
 //            MicroDeposits md = getFundingsourcesApi().microDeposits(vmdr, "459ed320-7c2b-4d4f-940a-cb86ab706d43");
 
 //            MicroDepositsInitiated fs = getFundingsourcesApi().verifyMicroDepositsExist("459ed320-7c2b-4d4f-940a-cb86ab706d43");
-
 
 
             log.info("done");

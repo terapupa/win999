@@ -2,7 +2,6 @@ package guidezup.win999.sys.DAO.dwolla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import guidezup.win999.Utils;
-import org.asynchttpclient.AsyncCompletionHandler;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.BoundRequestBuilder;
 import org.asynchttpclient.DefaultAsyncHttpClient;
@@ -26,10 +25,6 @@ public class TokenRetrieve {
     private static final String key = getParam1();
     private static final String sec = getParam2();
     private static final String url = getAuthUrl();
-
-//    private static final String key = "XH1Oe09DVokB1PUxYHcllCGsuD4eNpopeLrPNc36wc45HFWv1Z";
-//    private static final String sec = "RxbLCs0bnE9RGxYUsn5FFBb1N9dTxxFSykfDBjNtx43pg37iGU";
-//    private static final String url = "https://sandbox.dwolla.com/oauth/v2/token";
 
     private static volatile TokenRetrieve instance = null;
 
@@ -71,32 +66,25 @@ public class TokenRetrieve {
                     addFormParam("client_id", key).
                     addFormParam("client_secret", sec).
                     addFormParam("grant_type", "client_credentials");
-            builder.execute(new RetrieveHandler(asyncHttpClient, builder));
-        }
-
-        private class RetrieveHandler extends AsyncCompletionHandler {
-            private final BoundRequestBuilder builder;
-            private final AsyncHttpClient asyncHttpClient;
-
-            RetrieveHandler(final AsyncHttpClient asyncHttpClient, final BoundRequestBuilder builder) {
-                super();
-                this.builder = builder;
-                this.asyncHttpClient = asyncHttpClient;
-            }
-
-            public Object onCompleted(Response response) throws Exception {
-                Map<String, String> data = Utils.createObjectMapper().readValue(response.getResponseBody(),
-                        new TypeReference<Map<String, String>>() {
-                        });
-                if (data.containsKey("error")) {
-                    log.error("error={}", data.get("error"));
-                    Thread.sleep(5000);
-                    builder.execute(this);
-                } else {
-                    token.set(data.get("access_token"));
-                    asyncHttpClient.close();
+            while(true)
+            {
+                try {
+                    Response response = builder.execute().get();
+                    Map<String, String> data = Utils.createObjectMapper().readValue(response.getResponseBody(),
+                            new TypeReference<Map<String, String>>() {
+                            });
+                    if (data.containsKey("error")) {
+                        log.error("error={}", data.get("error"));
+                        Thread.sleep(500);
+                    } else {
+                        token.set(data.get("access_token"));
+                        asyncHttpClient.close();
+                        break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                return null;
+
             }
         }
     }
