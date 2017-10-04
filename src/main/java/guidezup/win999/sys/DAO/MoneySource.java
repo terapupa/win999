@@ -5,11 +5,12 @@ public class MoneySource {
     private String id;
     private SourceType type = SourceType.bank;
     private String name;
-    private String status;
+    private AccountStatus status;
+    private boolean removed = false;
 
     public enum AccountType {checking, savings};
-
     public enum SourceType {bank, balance};
+    public enum AccountStatus {unverified, verified};
 
     public String getId() {
         return id;
@@ -35,12 +36,20 @@ public class MoneySource {
         this.name = name;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(AccountStatus status) {
         this.status = status;
     }
 
-    public String getStatus() {
+    public AccountStatus getStatus() {
         return status;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
     }
 
 }

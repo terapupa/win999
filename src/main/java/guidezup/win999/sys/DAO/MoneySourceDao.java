@@ -10,4 +10,8 @@ public interface MoneySourceDao {
 
     public MoneySource retrieveMoneySource(String id) throws OperationException;
 
+    public MoneySource removeMoneySource(String id) throws OperationException;
+
+    public MoneySource initMicroDeposite(String id) throws OperationException;
+
     }

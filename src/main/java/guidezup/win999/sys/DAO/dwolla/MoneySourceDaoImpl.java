@@ -4,18 +4,19 @@ import guidezup.win999.Utils;
 import guidezup.win999.sys.DAO.MoneySource;
 import guidezup.win999.sys.DAO.MoneySourceDao;
 import guidezup.win999.sys.DAO.OperationException;
-import io.swagger.client.ApiException;
 import io.swagger.client.api.FundingsourcesApi;
 import io.swagger.client.model.CreateFundingSourceRequest;
 import io.swagger.client.model.FundingSource;
 import io.swagger.client.model.FundingSourceListResponse;
+import io.swagger.client.model.RemoveBankRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static guidezup.win999.Utils.createApiClient;
+import static guidezup.win999.sys.DAO.dwolla.DwollaUtils.createApiClient;
 
 public class MoneySourceDaoImpl implements MoneySourceDao {
     private static final Logger log = LoggerFactory.getLogger(MoneySourceDaoImpl.class);
@@ -31,29 +32,28 @@ public class MoneySourceDaoImpl implements MoneySourceDao {
             request.setName(nickName);
             FundingSource fs = getFundingsourcesApi().createCustomerFundingSource(request, playerId);
             return retrieveMoneySource(Utils.getIdFromUrlString(fs.getLocationHeader()));
-        } catch (ApiException e) {
-            log.error("errorCode={}, message={}", e.getCode(), e.getMessage());
-            throw new OperationException(e.getCode(), e.getMessage());
         } catch (Exception e) {
-            log.error("errorCode={}, message={}", OperationException.SOME_PROBLEM_CODE, e.getMessage());
-            throw new OperationException(OperationException.SOME_PROBLEM_CODE, e.getMessage());
+            throw guidezup.win999.sys.DAO.dwolla.DwollaUtils.exceptionTreatment(log, e);
         }
     }
 
     public List<MoneySource> retrieveMoneySources(String playerId, boolean activeOnly) throws OperationException {
         try {
             FundingSourceListResponse fslr = getFundingsourcesApi().getCustomerFundingSources(playerId, !activeOnly);
-            List list = (List)((Map)fslr.getEmbedded()).get("funding-sources");
-            //todo - continue to implement it...
-
-        } catch (ApiException e) {
-            log.error("errorCode={}, message={}", e.getCode(), e.getMessage());
-            throw new OperationException(e.getCode(), e.getMessage());
+            List<Map<String, String>> list = (List<Map<String, String>>) ((Map) fslr.getEmbedded()).get("funding-sources");
+            List<MoneySource> result = new ArrayList<MoneySource>();
+            for (Map<String, String> m : list) {
+                MoneySource ms = new MoneySource();
+                ms.setId(m.get("id"));
+                ms.setName(m.get("name"));
+                ms.setType(MoneySource.SourceType.valueOf(m.get("type")));
+                ms.setStatus(MoneySource.AccountStatus.valueOf(m.get("status")));
+                result.add(ms);
+            }
+            return result;
         } catch (Exception e) {
-            log.error("errorCode={}, message={}", OperationException.SOME_PROBLEM_CODE, e.getMessage());
-            throw new OperationException(OperationException.SOME_PROBLEM_CODE, e.getMessage());
+            throw guidezup.win999.sys.DAO.dwolla.DwollaUtils.exceptionTreatment(log, e);
         }
-        return null;
     }
 
     public MoneySource retrieveMoneySource(String id) throws OperationException {
@@ -63,18 +63,37 @@ public class MoneySourceDaoImpl implements MoneySourceDao {
             ms.setId(fs.getId());
             ms.setName(fs.getName());
             ms.setType(MoneySource.SourceType.valueOf(fs.getType()));
-            ms.setStatus(fs.getStatus());
+            ms.setStatus(MoneySource.AccountStatus.valueOf(fs.getStatus()));
             return ms;
-        } catch (ApiException e) {
-            log.error("errorCode={}, message={}", e.getCode(), e.getMessage());
-            throw new OperationException(e.getCode(), e.getMessage());
         } catch (Exception e) {
-            log.error("errorCode={}, message={}", OperationException.SOME_PROBLEM_CODE, e.getMessage());
-            throw new OperationException(OperationException.SOME_PROBLEM_CODE, e.getMessage());
+            throw guidezup.win999.sys.DAO.dwolla.DwollaUtils.exceptionTreatment(log, e);
         }
     }
 
-    private FundingsourcesApi getFundingsourcesApi() {
+    public MoneySource removeMoneySource(String id) throws OperationException {
+        try {
+            RemoveBankRequest rbr = new RemoveBankRequest();
+            rbr.setRemoved(true);
+            FundingSource fs = getFundingsourcesApi().softDelete(rbr, id);
+            MoneySource ms = new MoneySource();
+            ms.setId(fs.getId());
+            ms.setName(fs.getName());
+            ms.setType(MoneySource.SourceType.valueOf(fs.getType()));
+            ms.setStatus(MoneySource.AccountStatus.valueOf(fs.getStatus()));
+            ms.setRemoved(fs.getRemoved());
+            return ms;
+        } catch (Exception e) {
+            throw guidezup.win999.sys.DAO.dwolla.DwollaUtils.exceptionTreatment(log, e);
+        }
+    }
+
+    @Override
+    public MoneySource initMicroDeposite(String id) throws OperationException {
+        String url = DwollaUtils.getMicroDepositeUrl(id);
+        return null;
+    }
+
+    private static FundingsourcesApi getFundingsourcesApi() {
         return new FundingsourcesApi(createApiClient());
     }
 
@@ -82,10 +101,29 @@ public class MoneySourceDaoImpl implements MoneySourceDao {
         MoneySourceDaoImpl pdi = new MoneySourceDaoImpl();
         try {
 
-            MoneySource ms = pdi.retrieveMoneySource("335d9009-adfd-4964-8b7b-524857e4fe99");
+            pdi.initMicroDeposite("104dbd31-3328-4f90-9227-43d9ca6e3be9");
+
+//            MoneySource l = pdi.createMoneySource("2b03a9d0-199c-4a16-934d-7207aab9eca4", "222222226",
+//                    "007776662", "mayBank", MoneySource.AccountType.checking);
+////            MoneySource l = pdi.retrieveMoneySource("459ed320-7c2b-4d4f-940a-cb86ab706d43");
+////            MoneySource l = pdi.removeMoneySource("335d9009-adfd-4964-8b7b-524857e4fe99");
+//            VerifyMicroDepositsRequest vmdr = new VerifyMicroDepositsRequest();
+//            Amount amount = new Amount();
+//            Amount amount1 = new Amount();
+//            amount.setValue("0.05");
+//            amount.setCurrency("USD");
+//            amount1.setValue("0.04");
+//            amount1.setCurrency("USD");
+//            vmdr.setAmount1(amount);
+//            vmdr.setAmount2(amount);
+//            MicroDeposits md = getFundingsourcesApi().microDeposits(vmdr, "459ed320-7c2b-4d4f-940a-cb86ab706d43");
+
+//            MicroDepositsInitiated fs = getFundingsourcesApi().verifyMicroDepositsExist("459ed320-7c2b-4d4f-940a-cb86ab706d43");
+
+
 
             log.info("done");
-        } catch (OperationException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }

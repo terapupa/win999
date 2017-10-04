@@ -10,9 +10,12 @@ public interface PlayerDao {
 
     public Player deactivatePlayer(String id) throws OperationException;
 
-//    public Player createMoneySource(String id, MoneySource ms) throws OperationException;
-//
-//    public Player retrieveMoneySources(String id, boolean activeOnly) throws OperationException;
+    /**
+     * Get Instant account verification token.
+     * @param id - player ID
+     * @return - Instant account verification token
+     * @throws OperationException - operation exception
+     */
+    public String getIavToken(String id) throws OperationException;
 
-//    getCustomerFundingSources(String id, Boolean removed)
 }

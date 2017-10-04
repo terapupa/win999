@@ -1,6 +1,7 @@
-package guidezup.win999;
+package guidezup.win999.sys.DAO.dwolla;
 
 import com.sun.jersey.core.util.Base64;
+import guidezup.win999.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,34 +11,35 @@ import java.util.Properties;
 
 import static guidezup.win999.Utils.UNKNOWN;
 
-public class ServerProperties {
-    private static final Logger log = LoggerFactory.getLogger(ServerProperties.class);
+public class DwollaProperties {
+    private static final Logger log = LoggerFactory.getLogger(DwollaProperties.class);
     private static final String authUrl = "authUrl";
     private static final String baseUrl = "baseUrl";
     private static final String param1 = "param1";
     private static final String param2 = "param2";
+    private static final String microDepositeUrl = "microDepositeUrl";
 
-    private static volatile ServerProperties instance = null;
+    private static volatile DwollaProperties instance = null;
 
     private Properties properties;
 
 
-    public static ServerProperties getInstance() {
+    public static DwollaProperties getInstance() {
         if (instance == null) {
-            synchronized (ServerProperties.class) {
+            synchronized (DwollaProperties.class) {
                 if (instance == null) {
-                    instance = new ServerProperties();
+                    instance = new DwollaProperties();
                 }
             }
         }
         return instance;
     }
 
-    private ServerProperties() {
+    private DwollaProperties() {
         properties = new Properties();
         InputStream in = null;
         try {
-            in = Utils.class.getResourceAsStream("/win999.properties");
+            in = Utils.class.getResourceAsStream("/dwolla.properties");
             properties.load(in);
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
@@ -76,6 +78,12 @@ public class ServerProperties {
     public String getBaseUrl() {
         return getStringProp(baseUrl);
     }
+
+    public String getMicroDepositeUrl() {
+        return getStringProp(microDepositeUrl);
+    }
+
+
 
     private String getStringProp(String propName) {
         String prop = properties.getProperty(propName, UNKNOWN);

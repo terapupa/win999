@@ -16,13 +16,16 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static guidezup.win999.Utils.UNKNOWN;
+import static guidezup.win999.sys.DAO.dwolla.DwollaUtils.getAuthUrl;
+import static guidezup.win999.sys.DAO.dwolla.DwollaUtils.getParam1;
+import static guidezup.win999.sys.DAO.dwolla.DwollaUtils.getParam2;
 
 public class TokenRetrieve {
     private static final Logger log = LoggerFactory.getLogger(TokenRetrieve.class);
 
-    private static final String key = Utils.getParam1();
-    private static final String sec = Utils.getParam2();
-    private static final String url = Utils.getAuthUrl();
+    private static final String key = getParam1();
+    private static final String sec = getParam2();
+    private static final String url = getAuthUrl();
 
 //    private static final String key = "XH1Oe09DVokB1PUxYHcllCGsuD4eNpopeLrPNc36wc45HFWv1Z";
 //    private static final String sec = "RxbLCs0bnE9RGxYUsn5FFBb1N9dTxxFSykfDBjNtx43pg37iGU";
